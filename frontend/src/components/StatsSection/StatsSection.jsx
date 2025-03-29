@@ -1,6 +1,11 @@
 import { Box, Text, VStack, HStack, Button, SimpleGrid } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
+import { useApp } from '@/src/context/AppContext';
 
 const StatsSection = () => {
+  const { user } = useApp(); 
+  const router = useRouter();
+
   return (
     <Box py={12} px={{ base: 6, md: 16 }} textAlign="center">
       {/* الإحصائيات */}
@@ -36,7 +41,7 @@ const StatsSection = () => {
         <Text fontSize="xl" fontWeight="medium" color="gray.800">
           لا تدع الفرصة تفوتك! انضم إلى تحدي الستين الآن وابدأ رحلتك نحو حياة أفضل.
         </Text>
-        <Button size="lg" bg="yellow.400" color="black" _hover={{ bg: "yellow.300" }}>
+        <Button size="lg" bg="yellow.400" color="black" _hover={{ bg: "yellow.300" }} onClick={() => router.push(user !== null ? "/dashboard" : "/register")}>
           ابدأ التحدي
         </Button>
       </VStack>

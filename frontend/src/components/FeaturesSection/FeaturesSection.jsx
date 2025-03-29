@@ -3,8 +3,10 @@ import { FaRegClock, FaClipboardList, FaBan, FaTasks } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import MySVG from "@/public/svg/feepik-1.svg";
 import Image from "next/image";
+import { useApp } from '@/src/context/AppContext';
 
 const FeaturesSection = () => {
+  const { user } = useApp(); 
   const router = useRouter();
 
   return (
@@ -51,7 +53,7 @@ const FeaturesSection = () => {
         </List>
 
         {/* زر CTA */}
-        <Button size="lg" bg="yellow.400" color="black" _hover={{ bg: "yellow.300" }} onClick={() => router.push("/register")}>
+        <Button size="lg" bg="yellow.400" color="black" _hover={{ bg: "yellow.300" }} onClick={() => router.push(user !== null ? "/dashboard" : "/register")}>
           انضم الآن وابدأ التحدي
         </Button>
       </VStack>

@@ -39,6 +39,7 @@ const formatDate = (isoString) => {
 
 export default function AnnouncedChallengesPage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [announcedChallenges, setAnnouncedChallenges] = useState([]);
   const [selectedChallenge, setSelectedChallenge] = useState(null);
   const [personalGoal, setPersonalGoal] = useState('');
   const [sleepTime, setSleepTime] = useState('');
@@ -49,8 +50,14 @@ export default function AnnouncedChallengesPage() {
   const [showCustomHabitInput, setShowCustomHabitInput] = useState(false);
 
   const { showToast } = useCustomToast();
-  const { data: announcedChallenges, loading } = useGetData(GET_CHALLENGES_URL);
+  const { data: challenges, loading } = useGetData(GET_CHALLENGES_URL);
   const { addItem, loading: _loading, error } = useAddData(PARTICICPATE_CHALLENGE_URL); // الاشتراك في التحدي
+
+  useEffect(() => {
+    if (challenges) {
+      setAnnouncedChallenges(challenges || []);
+    }
+  }, [challenges]);
 
   // فتح نافذة الاشتراك عند الضغط على "اشترك"
   const handleJoinClick = (challenge) => {
@@ -68,6 +75,12 @@ export default function AnnouncedChallengesPage() {
 
   // إرسال البيانات عند الضغط على زر "اشتراك"
   const handleSubmit = async () => {
+      if (!personalGoal.trim() || !sleepTime.trim() || !wakeTime.trim() || !punishment.trim()) {
+        showToast("يرجى ملئ جميع الحقول المطلوبة.", "error");
+        return;
+      }
+
+    try {
     const challengeData = {
       personalGoal,
       sleepTime,
@@ -83,9 +96,16 @@ export default function AnnouncedChallengesPage() {
     const response = await addItem(challengeData);
     if (response) {
       showToast("تم الاشتراك في تحدي 60 بنجاح", "success");
+      // showToast(response.message, "success");
       console.log('تم الاشتراك بنجاح:', response);
       onClose();
     }
+
+  } catch (err) {
+    showToast(err.response.data.message, "error");
+    console.log(err.response.data.message);
+    onClose();
+  }
   };
 
   return (
@@ -101,7 +121,7 @@ export default function AnnouncedChallengesPage() {
         </Flex>
       ) : (
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
-          {announcedChallenges?.map((challenge) => (
+          {announcedChallenges &&announcedChallenges?.map((challenge) => (
             <Card
               key={challenge._id}
               p={5}
@@ -145,7 +165,7 @@ export default function AnnouncedChallengesPage() {
         onClose={onClose}
         title={`✍️ الاشتراك في ${selectedChallenge?.title}`}
         handleSaveChanges={handleSubmit}
-        type="add"
+        type="subscription"
       >
         <VStack spacing={4} align="stretch">
           {/* 🛑 عرض الخطأ إذا وُجد */}
@@ -156,7 +176,7 @@ export default function AnnouncedChallengesPage() {
             </Alert>
           )}
 
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>🎯 هدفك الشخصي</FormLabel>
             <Input
               placeholder="مثال: الالتزام بالرياضة يوميًا"
@@ -166,7 +186,7 @@ export default function AnnouncedChallengesPage() {
           </FormControl>
 
           <HStack>
-            <FormControl>
+            <FormControl isRequired>
               <FormLabel>🕰️ وقت الاستيقاظ</FormLabel>
               <Input
                 type="time"
@@ -174,7 +194,7 @@ export default function AnnouncedChallengesPage() {
                 onChange={(e) => setWakeTime(e.target.value)}
               />
             </FormControl>
-            <FormControl>
+            <FormControl isRequired>
               <FormLabel>🌙 وقت النوم</FormLabel>
               <Input
                 type="time"
@@ -184,7 +204,7 @@ export default function AnnouncedChallengesPage() {
             </FormControl>
           </HStack>
 
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>⚠️ العقوبة في حال الفشل</FormLabel>
             <Input
               placeholder="مثال: التبرع بمبلغ مالي"

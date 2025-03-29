@@ -91,7 +91,7 @@ export default function ManageUsers() {
   return (
     <Box p={5} bg="gray.50" minH="100vh">
       <HStack justify="space-between" mb={5}>
-        <Text fontSize="2xl" fontWeight="bold">⚙️ إدارة الأبطال والبطلات</Text>
+        <Text fontSize="2xl" fontWeight="bold">⚙️ إدارة الأبطال والبطلات للمشرف</Text>
       </HStack>
 
       {/* جدول المستخدمين في الشاشات الكبيرة */}

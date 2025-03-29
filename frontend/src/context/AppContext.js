@@ -3,11 +3,11 @@ import { createContext, useContext, useState, useEffect } from "react";
 import useAddData from "@/src/hooks/useAddData";
 import useUpdateData from "@/src/hooks/useUpdateData";
 import useDeleteData from "@/src/hooks/useDeleteData";
-import { PROFILE_URL, LOGOUT_URL } from "@/src/config/urls"; // مسار  LINK_URL فقط كمثال .. يمكنك استدعاء المسارات الحقيقية
+import { PROFILE_URL, LOGOUT_URL, DOCUMENT_DAY_URL } from "@/src/config/urls"; // مسار  LINK_URL فقط كمثال .. يمكنك استدعاء المسارات الحقيقية
 import { useRouter } from "next/navigation";
 import apiClient from "@/src/config/axios";
 
-// إنشاء سياق موحّد 
+// إنشاء سياق موحّد
 const AppContext = createContext();
 
 // دالة مخصصة لاستخدام سياق التطبيق بسهولة في المكونات الأخرى.
@@ -17,54 +17,37 @@ export const useApp = () => useContext(AppContext);
 export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [challenge, setChallenge] = useState(null);
 
   const router = useRouter();
+  const { addItem, loading: docLoading, error: docError } = useAddData(DOCUMENT_DAY_URL); // لتوثيق اليوم
 
-  // const { addItem } = useAddData(LINK_URL);
-  // const { updateData } = useUpdateData(LINK_URL);
-  // const { deleteData } = useDeleteData(LINK_URL);
+  // تحميل بيانات المستخدم من الجلسة (من خلال API) عند التهيئة و جلب بيانات السلة.
+  const fetchUser = async () => {
+    try {
+      setLoading(true);
+      // جلب بيانات المستخدم
+      const { data: userData } = await apiClient.get(PROFILE_URL);
+      console.log("User data fetched:", userData); // عرض بيانات المستخدم
+      setUser(userData);
+      setLoading(false);
+    } catch (error) {
+      console.error(
+        "Error fetching user or cart data:",
+        error.message || error
+      );
+      setUser(null);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser(); // جلب البيانات المستخدم
+  }, []);
 
 
-    // const fetchUser = async () => {
-    //   try {
-    //     setLoading(true);
-    //     // جلب بيانات المستخدم
-    //     const { data: userData } = await apiClient.get(PROFILE_URL);
-    //     // console.log("User data fetched:", userData); // عرض بيانات المستخدم في كونسول
-
-    //     setUser(userData);
-    //     setLoading(false);
-    //   } catch (error) {
-    //     console.error("Error fetching user data:", error.message || error);
-    //     setUser(null);
-    //     setLoading(false);
-    //   }
-    // };
-  
-    // useEffect(() => {
-    //     fetchUser(); // جلب البيانات المستخدم 
-    // }, []);
-
-        // تحميل بيانات المستخدم من الجلسة (من خلال API) عند التهيئة و جلب بيانات السلة.
-        const fetchUser = async () => {
-          try {
-            setLoading(true);
-            // جلب بيانات المستخدم
-            const { data: userData } = await apiClient.get(PROFILE_URL);
-            console.log("User data fetched:", userData); // عرض بيانات المستخدم
-            setUser(userData);
-            setLoading(false);
-          } catch (error) {
-            console.error("Error fetching user or cart data:", error.message || error);
-            setUser(null);
-            setLoading(false);
-          }
-        };
-      
-        useEffect(() => {
-            fetchUser(); // جلب البيانات المستخدم 
-        }, []);
-    
   // تسجيل الخروج.
   const logout = async () => {
     try {
@@ -77,13 +60,33 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+
+    // دالة توثيق اليوم (documentDailyProgress)
+    const documentDailyProgress = async (payload) => {
+      try {
+        const response = await addItem(payload);
+        return response;
+      } catch (error) {
+        console.error("Error documenting daily progress:", error);
+        throw error;
+      }
+    };
+
   // تمرير القيم والدوال إلى المكونات الفرعية عبر سياق التطبيق.
   return (
     <AppContext.Provider
       value={{
         user,
+        loading,
         setUser,
         logout,
+        startDate,
+        setStartDate,
+        endDate,
+        setEndDate,
+        documentDailyProgress,
+        challenge, 
+        setChallenge,
       }}
     >
       {children} {/* عرض جميع المكونات الفرعية التي تستفيد من سياق التطبيق */}

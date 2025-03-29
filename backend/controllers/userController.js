@@ -9,13 +9,21 @@ const { createTransporter, createMailOptions } = require('../helpers/email');
 const generateVerificationCode = require("../helpers/generateVerificationCode");
 
 
-// إعدادات الكوكيز
+// إعدادات الكوكيز المحلية
 const cookieOptions = {
   httpOnly: true, // يجعل التوكن غير متاح للوصول عبر JavaScript في الواجهة الأمامية، مما يزيد من الأمان.
   secure: process.env.NODE_ENV === 'production', // اذا كان متغير البيئة هو production ستكون النتيجة secure: true وذلك يعني يتم استخدام https فقط في بيئة الإنتاج تستخدم ذلك فقط اذا اتيح لك https لتشغيل HTTPS في بيئة الإنتاج، تحتاج إلى شهادة SSL .. اما اذا كانت البيئة development  ستكون النتيجة secure: false وذلك يعني يتم استخدام http فقط . 
-  sameSite: 'none', // ليتم إرسال الكوكيز مع جميع الطلبات، حتى إذا كانت تأتي من نطاقات مختلفة.
+  sameSite: "lax",
   maxAge: 7 * 24 * 60 * 60 * 1000, // مدة التوكن 7 أيام
 };
+
+// اعدادات الكوكيز عند النشر
+// const cookieOptions = {
+//   httpOnly: true, // يجعل التوكن غير متاح للوصول عبر JavaScript في الواجهة الأمامية، مما يزيد من الأمان.
+//   secure: process.env.NODE_ENV === 'production', // اذا كان متغير البيئة هو production ستكون النتيجة secure: true وذلك يعني يتم استخدام https فقط في بيئة الإنتاج تستخدم ذلك فقط اذا اتيح لك https لتشغيل HTTPS في بيئة الإنتاج، تحتاج إلى شهادة SSL .. اما اذا كانت البيئة development  ستكون النتيجة secure: false وذلك يعني يتم استخدام http فقط . 
+//   sameSite: "none", // ليتم إرسال الكوكيز مع جميع الطلبات، حتى إذا كانت تأتي من نطاقات مختلفة.
+//   maxAge: 7 * 24 * 60 * 60 * 1000, // مدة التوكن 7 أيام
+// };
 
 
 // Register a user

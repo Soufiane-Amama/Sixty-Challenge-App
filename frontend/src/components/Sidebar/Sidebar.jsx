@@ -3,6 +3,7 @@
 import {
   Box,
   VStack,
+  Heading,
   Text,
   Flex,
   Icon,
@@ -40,16 +41,24 @@ const Sidebar = ({ isOpen, onClose, isAdmin, onPageChange, activePage, setActive
         display={{ base: "none", md: "block" }} // إخفاء على الشاشات الصغيرة
       >
         <Flex align="center" mb={4}>
-          <Avatar
-            size="md"
-            name="Soufiane Amama"
-            src="/images/hero-.png"
-            ml={3}
-            // filter="sepia(50%) hue-rotate(30deg) brightness(1.0) contrast(1.2)"
-          />
-          <Text fontSize="lg" fontWeight="bold">
-            {user?.fullName}
-          </Text>
+          {user ? (
+            <>
+              <Avatar
+                size="md"
+                name={user?.fullName}
+                src="/images/hero-.png"
+                ml={3}
+                // filter="sepia(50%) hue-rotate(30deg) brightness(1.0) contrast(1.2)"
+              />
+              <Text fontSize="lg" fontWeight="bold">
+                {user?.fullName}
+              </Text>
+            </>
+          ) : (
+            <Heading fontSize={"xl"} fontWeight="bold" my={3}>
+              القائمة
+            </Heading>
+          )}
         </Flex>
 
         {/* القسم القابل للتمرير */}

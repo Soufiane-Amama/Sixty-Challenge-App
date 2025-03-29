@@ -23,7 +23,7 @@ import {
         </ModalBody>
         <ModalFooter>
           <Button colorScheme="blue" mr={3} onClick={handleSaveChanges}>
-            {type === "edit" ? "حفظ التعديلات" : type === "log" ? "توثيق" : "إضافة"}
+            {type === "edit" ? "حفظ التعديلات" : type === "log" ? "توثيق" : type === "subscription" ? "اشتراك" : "إضافة"}
           </Button>
           <Button variant="ghost" mr={3} onClick={onClose}>
             إلغاء

@@ -2,11 +2,14 @@ import { Box, Text, VStack, HStack, Button, List, ListItem, ListIcon } from "@ch
 import { FaTimesCircle, FaCheckCircle } from "react-icons/fa";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useApp } from '@/src/context/AppContext';
 import MySVG1 from "@/public/svg/feepik-2.svg";
 import MySVG2 from "@/public/svg/feepik-3.svg";
 
 const ChallengeComparison = () => {
+  const { user } = useApp(); 
   const router = useRouter();
+
   return (
     <Box id="challenge" py={12} px={{ base: 6, md: 16 }} bgGradient="linear(to-r, yellow.50, white)">
       {/* العنوان */}
@@ -68,7 +71,7 @@ const ChallengeComparison = () => {
 
       {/* زر CTA */}
       <VStack mt={8}>
-        <Button size="lg" bg="yellow.400" color="black" _hover={{ bg: "yellow.300" }} onClick={() => router.push("/register")}>
+        <Button size="lg" bg="yellow.400" color="black" _hover={{ bg: "yellow.300" }} onClick={() => router.push(user !== null ? "/dashboard" : "/register")}>
           ابدأ التحدي الآن
         </Button>
       </VStack>

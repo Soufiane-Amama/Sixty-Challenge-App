@@ -8,7 +8,7 @@ const router = express.Router();
 router.post("/", protect, createDailyProgress);
 
 // جلب توثيقات تحدي معين
-router.get("/", protect, getDailyProgressByChallenge);
+router.get("/:challengeId", protect, getDailyProgressByChallenge);
 
 // حذف سجل تقدم يومي
 router.delete("/:dailyProgressId", protect, deleteDailyProgress);

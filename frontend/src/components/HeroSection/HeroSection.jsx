@@ -2,8 +2,10 @@ import { Box, Text, Button, VStack, HStack, Image, Badge } from "@chakra-ui/reac
 import { FaRegStar } from "react-icons/fa";
 import HeroBadge from "../../elements/HeroBadge";
 import { useRouter } from "next/navigation";
+import { useApp } from '@/src/context/AppContext';
 
 const HeroSection = () => {
+  const { user } = useApp(); 
   const router = useRouter();
 
   return (
@@ -30,7 +32,7 @@ const HeroSection = () => {
             size="lg" 
             borderRadius="full" 
             _hover={{ bgGradient: "linear(to-r, purple.500, purple.700)", transform: "scale(1.05)" }}
-            onClick={() => router.push("/register")}
+            onClick={() => router.push(user !== null ? "/dashboard" : "/register")}
           >
             انضم لأبطال الستين
             <svg height="20" width="20" fill="#FFFFFF" viewBox="0 0 24 24" data-name="Layer 1" id="Layer_1" class="sparkle">

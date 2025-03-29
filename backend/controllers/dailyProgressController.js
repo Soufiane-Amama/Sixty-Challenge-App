@@ -6,8 +6,9 @@ const AnnouncedChallenge = require("../models/announcedChallengeModel");
 const Challenge = require("../models/challengeModel");
 const AiNotification = require("../models/AI.NotificationModel");
 const { generateMotivationalMessage } = require("../helpers/aiService");
+const { isValidObjectId } = require("mongoose");
 
-
+// معالج توثيق اليوم
 const createDailyProgress = asyncHandler(async (req, res) => {
   // التحقق من المدخلات
   await body("challengeId").notEmpty().withMessage("معرف التحدي مطلوب").run(req);
@@ -15,7 +16,6 @@ const createDailyProgress = asyncHandler(async (req, res) => {
   await body("additionalHabits").isArray().withMessage("العادات الإضافية يجب أن تكون قائمة").run(req);
   await body("additionalHabits.*.habit").isString().notEmpty().withMessage("يجب أن تحتوي كل عادة على اسم صحيح").run(req);
   await body("additionalHabits.*.completed").isBoolean().withMessage("حالة العادة يجب أن تكون صحيحة").run(req);
-
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -26,7 +26,12 @@ const createDailyProgress = asyncHandler(async (req, res) => {
     return res.status(400).json({ errors: formattedErrors });
   }
 
-  const { challengeId, tasks, additionalHabits } = req.body;
+
+  const { challengeId, tasks, additionalHabits, date } = req.body;
+
+  if (!isValidObjectId(challengeId)) {
+    return res.status(400).json({ error: "معرف التحدي غير صالح" });
+  }
 
   // التحقق من صحة التحدي وصلاحيته للمستخدم
   const challenge = await Challenge.findById(challengeId);
@@ -36,25 +41,38 @@ const createDailyProgress = asyncHandler(async (req, res) => {
 
   // إذا كان التحدي الشخصي مرتبطًا بتحدي معلن، نقوم بالتحقق من مواعيده
   if (challenge.announcedChallengeId) {
-    const announcedChallenge = await AnnouncedChallenge.findById(challenge.announcedChallengeId);
+    const announcedChallenge = await AnnouncedChallenge.findById(
+      challenge.announcedChallengeId
+    );
     if (!announcedChallenge) {
       return res.status(400).json({ error: "التحدي المعلن غير موجود" });
     }
-    const now = new Date();
-    if (now < new Date(announcedChallenge.startDate)) {
+    const now = Date.now();
+
+    if (now < new Date(announcedChallenge.startDate).getTime()) {
       return res.status(400).json({ error: "لم يبدأ تحدي 60 بعد" });
     }
-    if (now >= new Date(announcedChallenge.endDate)) {
+
+    if (now >= new Date(announcedChallenge.endDate).getTime()) {
       return res.status(400).json({ error: "انتهى تحدي 60، لا يمكن توثيق التقدم اليومي" });
     }
   }
 
-  const today = new Date().setHours(0, 0, 0, 0);
-  const existingProgress = await DailyProgress.findOne({ challengeId, date: new Date(today) });
+  // استخدام التاريخ المرسل من الطلب، وإذا لم يكن موجودًا، استخدم تاريخ اليوم
+  const progressDate = date ? new Date(date) : new Date();
+  progressDate.setHours(0, 0, 0, 0);
+  if (isNaN(progressDate.getTime())) {
+    return res.status(400).json({ error: "تنسيق التاريخ غير صالح" });
+  }
+
+  const existingProgress = await DailyProgress.findOne({
+    challengeId,
+    date: progressDate,
+  });
 
   if (existingProgress) {
     if (existingProgress.isLocked) {
-      return res.status(400).json({ error: "تم توثيق اليوم بالفعل" });
+      return res.status(400).json({ error: "تم توثيق هذا اليوم بالفعل" });
     }
     return res.status(400).json({ error: "لقد قمت بإدخال التقدم لهذا اليوم بالفعل" });
   }
@@ -74,11 +92,12 @@ const createDailyProgress = asyncHandler(async (req, res) => {
   const mergedTasks = { ...defaultTasks, ...tasks };
 
   // حساب النقاط المكتسبة اليوم (قبل الإنشاء)
-  const dailyPoints = Object.values(mergedTasks)
-    .filter((task) => task.completed)
-    .reduce((sum, task) => sum + task.points, 0) - 
+  const dailyPoints =
+    Object.values(mergedTasks)
+      .filter((task) => task.completed)
+      .reduce((sum, task) => sum + task.points, 0) -
     // خصم نقطة لكل عادة إضافية لم تنفذ
-    additionalHabits.filter(habit => {
+    additionalHabits.filter((habit) => {
       // يفترض أن additionalHabits تحتوي على كائنات من النوع { habit, completed }
       return !habit.completed;
     }).length;
@@ -87,10 +106,10 @@ const createDailyProgress = asyncHandler(async (req, res) => {
   const dailyProgress = await DailyProgress.create({
     userId: req.user._id,
     challengeId,
-    date: today,
+    date: progressDate,
     tasks: mergedTasks,
     additionalHabits,
-    dailyPoints, 
+    dailyPoints,
     isLocked: true,
   });
 
@@ -98,15 +117,10 @@ const createDailyProgress = asyncHandler(async (req, res) => {
   challenge.challengePoints += dailyPoints;
   await challenge.save();
 
-  // تحديث مجموع النقاط في حساب المستخدم
-  const user = await User.findById(req.user._id);
-  if (user) {
-    user.totalPoints += dailyPoints;
-    await user.save();
-  }
-
   // إنشاء رسالة تحفيزية باستخدام الذكاء الاصطناعي
-  const completedTasks = Object.keys(mergedTasks).filter((task) => mergedTasks[task].completed);
+  const completedTasks = Object.keys(mergedTasks).filter(
+    (task) => mergedTasks[task].completed
+  );
   let motivationalMessage;
   try {
     motivationalMessage = await generateMotivationalMessage({
@@ -120,7 +134,8 @@ const createDailyProgress = asyncHandler(async (req, res) => {
     }
   } catch (error) {
     console.warn("⚠️ خطأ في توليد الرسالة التحفيزية:", error.message);
-    motivationalMessage = "أحسنت! تقدم رائع اليوم، استمر في هذا الأداء المتميز! 💪🚀";
+    motivationalMessage =
+      "أحسنت! تقدم رائع اليوم، استمر دائما وقدم الأفضل! 💪🚀";
   }
 
   // حذف أي رسالة تحفيزية سابقة للمستخدم
@@ -174,7 +189,7 @@ const getUserDailyProgressGrouped = asyncHandler(async (req, res) => {
 
 // معالج لجلب جميع سجلات التقدم اليومي لتحدي معين
 const getDailyProgressByChallenge = asyncHandler(async (req, res) => {
-  const { challengeId } = req.body;
+  const { challengeId } = req.params;
 
   if (!challengeId) {
     return res.status(400).json({ error: "معرف التحدي مطلوب" });
@@ -182,7 +197,11 @@ const getDailyProgressByChallenge = asyncHandler(async (req, res) => {
 
   // البحث عن سجلات التقدم اليومي المرتبطة بالتحدي وترتيبها حسب التاريخ تصاعديًا
   const dailyProgressRecords = await DailyProgress.find({ challengeId })
-    .sort({ date: 1 });
+    .sort({ date: 1 })
+    .populate({
+      path: "challengeId",
+      populate: { path: "announcedChallengeId", select: "startDate endDate" }
+    });
 
   if (!dailyProgressRecords || dailyProgressRecords.length === 0) {
     return res.status(404).json({ message: "لا توجد سجلات توثيق لهذا التحدي" });

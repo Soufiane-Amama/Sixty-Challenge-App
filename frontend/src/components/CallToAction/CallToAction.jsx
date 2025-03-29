@@ -1,7 +1,9 @@
 import { Box, Text, Button } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
+import { useApp } from '@/src/context/AppContext';
 
 const CallToAction = () => {
+  const { user } = useApp(); 
   const router = useRouter();
 
   return (
@@ -39,7 +41,7 @@ const CallToAction = () => {
         fontSize="md"
         fontWeight="bold"
         _hover={{ bgGradient: "linear(to-r, purple.500, purple.700)", transform: "scale(1.05)" }}
-        onClick={() => router.push("/register")}
+        onClick={() => router.push(user !== null ? "/dashboard" : "/register")}
       >
         ✨ ابدأ التحدي
       </Button>

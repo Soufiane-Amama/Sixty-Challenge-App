@@ -30,8 +30,11 @@ export const DELETE_MY_CHALLENGE_URL = "/api/challenge";
 
 
 // Daily Progress URLs 
+export const GET_DOCUMENTION_DAYS_URL = (challengeId) => `/api/daily-progress/${challengeId}`;
 export const DOCUMENT_DAY_URL = "/api/daily-progress";
+
 
 
 // AI Notification URLs 
 export const GET_RECOMMENDATIONS_URL = "/api/ai-notification/recommendation";
+export const GET_MOTIVATION_URL = "/api/ai-notification/motivation";

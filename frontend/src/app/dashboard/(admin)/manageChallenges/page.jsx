@@ -65,7 +65,7 @@ export default function ManageChallenges() {
   return (
     <Box p={5} bg="gray.50" minH="100vh">
       <HStack justify="space-between" mb={5}>
-        <Text fontSize="2xl" fontWeight="bold">⚙️ إدارة التحديات</Text>
+        <Text fontSize="2xl" fontWeight="bold">⚙️ إدارة التحديات للمشرف</Text>
         <Button leftIcon={<FaPlus />} colorScheme="blue" onClick={onOpen}>
           إضافة تحدي جديد
         </Button>

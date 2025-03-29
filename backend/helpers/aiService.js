@@ -79,4 +79,39 @@ const generateMotivationalMessage = async (userPerformanceData) => {
   }
 };
 
-module.exports = { analyzePerformance, generateMotivationalMessage };
+// 🗺️ دالة توليد خطة خطوة بخطوة لتحقيق الهدف
+const generatePlan = async (userGoal) => {
+  try {
+    const prompt = `
+    أنت مساعد ذكاء اصطناعي متخصص في وضع خطط عملية لتحقيق الأهداف.
+    
+    **التعليمات:**
+    - لا تقدم مقدمات أو تحليلات إضافية.
+    - فقط قم بتوليد خطة خطوة بخطوة باللغة العربية.
+    - اجعل الخطة قصيرة وواضحة (4-8 خطوات فقط).
+    - ركز على خطوات عملية وواقعية تناسب المبتدئين.
+    - تأكد أن كل خطوة هي جملة مكتملة وواضحة لغويًا.
+    - لا تكرر الهدف في الخطة، فقط اذكر الخطوات مباشرة.
+    
+    **الهدف:**
+    ${userGoal}
+    
+    **المطلوب:**
+    اخرج الخطة كقائمة مرقمة (مثل: 1. الخطوة الأولى. 2. الخطوة الثانية.)، دون أي عبارات إضافية.
+    `;
+    
+    const response = await openai.chat.completions.create({
+      model: "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+      messages: [{ role: "system", content: prompt }],
+      temperature: 0.7,
+      max_tokens: 300,
+    });
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error("❌ خطأ في توليد الخطة:", error.response ? error.response.data : error.message);
+    return null;
+  }
+};
+
+module.exports = { analyzePerformance, generateMotivationalMessage, generatePlan };
