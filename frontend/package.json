@@ -13,6 +13,7 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
+    "@lottiefiles/dotlottie-react": "^0.13.3",
     "axios": "^1.7.9",
     "chart.js": "^4.4.8",
     "dagre": "^0.8.5",

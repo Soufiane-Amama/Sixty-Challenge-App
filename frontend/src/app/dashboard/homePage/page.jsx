@@ -5,22 +5,21 @@ import {
   Box,
   Text,
   VStack,
-  HStack,
-  Avatar,
   Progress,
   SimpleGrid,
-  Card,
-  CardBody,
   Icon,
   Spinner,
 } from "@chakra-ui/react";
-import { FaTrophy, FaCheckCircle, FaTasks, FaQuoteLeft } from "react-icons/fa";
+import { FaQuoteLeft } from "react-icons/fa";
 import useGetData from "@/src/hooks/useGetData";
-import { GET_MOTIVATION_URL } from "@/src/config/urls";
+import { GET_MOTIVATION_URL, GET_BADGES_URL, GET_PUNISHMENTS_URL } from "@/src/config/urls";
 import MotivationCard from "@/src/components/MotivationCard/MotivationCard";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import Leaderboard from "@/src/components/Leaderboard/Leaderboard";
+import { useApp } from '@/src/context/AppContext';
+import Statistics from "@/src/components/Statistics/Statistics";
 
 // بيانات المتصدرين
 const leaderboard = [
@@ -52,12 +51,17 @@ const motivationalMessages = [
 ];
 
 export default function Dashboard() {
+  const { user, loading: _loading } = useApp();
   // const [tasks, setTasks] = useState([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [aiMessage, setAiMessage] = useState("");
+   const [badges, setBadges] = useState([]);
+    const [punishments, setPunishments] = useState([]);
 
     const { data, loading: isLoading, error } = useGetData(GET_MOTIVATION_URL);
+    const { data: badgesData, loading: loadingBadges, error: errorBadges } = useGetData(GET_BADGES_URL);
+    const { data: punishmentsData, loading: loadingPunishments, error: errorPunishments } = useGetData(GET_PUNISHMENTS_URL);
 
     useEffect(() => {
       if (isLoading) return; // لا تفعل شيء أثناء التحميل
@@ -68,7 +72,9 @@ export default function Dashboard() {
       } else {
         setAiMessage(data.message);
       }
-    }, [data, isLoading, error]);
+      if (badgesData) setBadges(badgesData || []);
+      if (punishmentsData) setPunishments(punishmentsData || []);
+    }, [data, badgesData, punishmentsData]);
 
   // جلب رسالة تحفيزية عند تحميل الصفحة
   useEffect(() => {
@@ -100,43 +106,7 @@ export default function Dashboard() {
       </Box>
 
       {/* إحصائيات */}
-      <SimpleGrid columns={{ base: 1, md: 3 }} spacing={5} mt={5}>
-        <Card>
-          <CardBody>
-            <HStack>
-              <Icon as={FaTrophy} color="yellow.500" boxSize={6} />
-              <VStack align="start">
-                <Text fontWeight="bold">الأوسمة 🏅</Text>
-                <Text>3</Text>
-              </VStack>
-            </HStack>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardBody>
-            <HStack>
-              <Icon as={FaCheckCircle} color="green.500" boxSize={6} />
-              <VStack align="start">
-                <Text fontWeight="bold">النقاط الإجمالية</Text>
-                <Text>120 نقطة</Text>
-              </VStack>
-            </HStack>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardBody>
-            <HStack>
-              <Icon as={FaTasks} color="red.500" boxSize={6} />
-              <VStack align="start">
-                <Text fontWeight="bold">العقوبات ⚠️</Text>
-                <Text>1</Text>
-              </VStack>
-            </HStack>
-          </CardBody>
-        </Card>
-      </SimpleGrid>
+      <Statistics user={user} badges={badges} punishments={punishments} />
 
       {/* 💡 قسم الرسالة التحفيزية */}
       <Box
@@ -191,6 +161,12 @@ export default function Dashboard() {
           📆 التقويم
         </Text>
         <Calendar />
+        {/* <DotLottieReact
+          src="https://lottie.host/6c4ef454-3e07-4771-8cf3-b4ca08e6ccb2/xWXyOAaswj.lottie"
+          loop
+          autoplay
+          style={{ width: "30vw", height: "30vh" }} 
+        /> */}
       </Box>
     </Box>
   );

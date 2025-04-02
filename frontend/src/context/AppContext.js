@@ -15,6 +15,7 @@ export const useApp = () => useContext(AppContext);
 
 // مزود سياق, الذي يحتفظ بالحالات ويقوم بتوزيعها على جميع المكونات الفرعية.
 export const AppProvider = ({ children }) => {
+  const [activePage, setActivePage] = useState("dashboard");
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [startDate, setStartDate] = useState(null);
@@ -79,6 +80,8 @@ export const AppProvider = ({ children }) => {
         user,
         loading,
         setUser,
+        activePage,
+        setActivePage,
         logout,
         startDate,
         setStartDate,

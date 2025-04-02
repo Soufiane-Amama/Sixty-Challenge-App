@@ -33,9 +33,12 @@ const theme = extendTheme({
     light: {
       bg: '#FCFBFC',
       text: "#141414",
-      cardBg: "#F0B429",
+      // cardBg: "#F0B429",
+      // cardBg: "#fff131",
+      cardBg: "#ecc94b",
       icon: "#fefcbf",
-      gold: '#ffd700',
+      // gold: '#ffd700',
+      gold: '#FEF250',
       hover: "#f1ee7c",
     },
     dark: {

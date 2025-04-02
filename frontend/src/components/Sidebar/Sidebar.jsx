@@ -46,7 +46,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin, onPageChange, activePage, setActive
               <Avatar
                 size="md"
                 name={user?.fullName}
-                src="/images/hero-.png"
+                src={user?.gender === "بطل" ? "/images/hero-1.png" : "/images/heroine-1.png"}
                 ml={3}
                 // filter="sepia(50%) hue-rotate(30deg) brightness(1.0) contrast(1.2)"
               />

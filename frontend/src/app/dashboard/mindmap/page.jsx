@@ -1,13 +1,38 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Box, Button, Input, VStack, Stack, Heading, Text } from "@chakra-ui/react";
+import { Box, Button, Input, VStack, Stack, Heading, Text, Alert, AlertIcon, AlertTitle, AlertDescription } from "@chakra-ui/react";
 import { toPng, toSvg } from "html-to-image"
 import apiClient from "@/src/config/axios";
 import ReactFlow, { Background, ReactFlowProvider } from "react-flow-renderer"; 
-import CustomNode from "@/src/components/CustomNode/CustomNode"; // ✅ استيراد العقدة المخصصة
+import CustomNode from "@/src/components/CustomNode/CustomNode"; //  استيراد العقدة المخصصة
+import { MdInfo } from "react-icons/md"; // أيقونة تنبيه
 
-const nodeTypes = { custom: CustomNode }; // ✅ تعريف نوع العقدة المخصصة
+
+const nodeTypes = { custom: CustomNode }; // تعريف نوع العقدة المخصصة
+
+// صندوق التنبيه برسالة
+const FeatureInfoBox = () => (
+  <Alert
+    status="info"
+    variant="subtle"
+    flexDirection="column"
+    alignItems="center"
+    textAlign="center"
+    borderRadius="md"
+    p={4}
+    bg="blue.50"
+    color="blue.800"
+  >
+    <AlertIcon boxSize="30px" as={MdInfo} />
+    <AlertTitle fontSize="lg" fontWeight="bold">
+      ميزة مجانية لفترة محدودة! 🎉
+    </AlertTitle>
+    <AlertDescription fontSize="md">
+      حالياً، يمكنك إنشاء خريطة هدفك **مجانًا**، ولكن لاحقًا ستصبح هذه الميزة بـ <b>10 نقاط لكل محاولة</b>.
+    </AlertDescription>
+  </Alert>
+);
 
 const MindMapPage = () => {
   const flowRef = useRef(null);
@@ -77,6 +102,9 @@ const MindMapPage = () => {
   return (
     <Box p={5} minH="100vh" bg="gray.50">
       <VStack spacing={6} align="stretch" maxW="800px" mx="auto">
+
+       <FeatureInfoBox /> {/* رسالة التنبيه */}
+
         <Heading as="h2" size="xl" textAlign="center" color="teal.500">
           خريطة لهدف تحدي 60
         </Heading>

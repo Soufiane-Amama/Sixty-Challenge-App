@@ -28,9 +28,9 @@ const MotivationCard = ({ message, loading }) => {
 
       {/* نص الرسالة */}
       <VStack align="start" spacing={1} flex="1">
-        <Text fontSize="lg" fontWeight="bold">
+        {/* <Text fontSize="lg" fontWeight="bold">
           ذكاء اصطناعي 🤖
-        </Text>
+        </Text> */}
         <Text fontSize="md">
             {loading ? "جاري مراجعة أداءك ..." : message}
         </Text>

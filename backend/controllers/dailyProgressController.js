@@ -26,7 +26,6 @@ const createDailyProgress = asyncHandler(async (req, res) => {
     return res.status(400).json({ errors: formattedErrors });
   }
 
-
   const { challengeId, tasks, additionalHabits, date } = req.body;
 
   if (!isValidObjectId(challengeId)) {
@@ -37,6 +36,13 @@ const createDailyProgress = asyncHandler(async (req, res) => {
   const challenge = await Challenge.findById(challengeId);
   if (!challenge || challenge.userId.toString() !== req.user._id.toString()) {
     return res.status(403).json({ error: "تحدٍ غير موجود أو غير مسموح" });
+  }
+
+  if (challenge.status === "متوقف") {
+    return res.status(400).json({ error: "لا يمكنك توثيق في هذا التحدي بعد ايقافه." });
+  }
+  if (challenge.status === "منتهي") {
+    return res.status(400).json({ error: "عذراً، انتهى تحدي 60، لا يمكن توثيق التقدم اليومي" });
   }
 
   // إذا كان التحدي الشخصي مرتبطًا بتحدي معلن، نقوم بالتحقق من مواعيده

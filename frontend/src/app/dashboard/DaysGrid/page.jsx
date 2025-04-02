@@ -11,6 +11,7 @@ import {
   Flex,
   Spinner,
   useColorModeValue,
+  Button, 
 } from "@chakra-ui/react";
 import useGetData from "@/src/hooks/useGetData";
 import useAddData from "@/src/hooks/useAddData";
@@ -18,6 +19,8 @@ import useCustomToast from "@/src/hooks/useCustomToast";
 import { GET_DOCUMENTION_DAYS_URL, DOCUMENT_DAY_URL } from "@/src/config/urls";
 import FormModal from "@/src/components/Modal/FormModal";
 import { useApp } from "@/src/context/AppContext";
+import { useRouter } from "next/navigation";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 
 const generateChallengeDays = (startDate, endDate) => {
   const daysArray = [];
@@ -43,7 +46,7 @@ const generateChallengeDays = (startDate, endDate) => {
 
 export default function DaysGrid({ challengeId, startDate, endDate, challenge }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { documentDailyProgress } = useApp();
+  const { setActivePage, documentDailyProgress } = useApp();
   const [days, setDays] = useState([]);
   const [selectedDay, setSelectedDay] = useState(null);
   const [completedHabits, setCompletedHabits] = useState({});
@@ -67,20 +70,14 @@ export default function DaysGrid({ challengeId, startDate, endDate, challenge })
     if (startDate && endDate) {
       setDays(generateChallengeDays(startDate, endDate));
     }
+    
   }, [startDate, endDate]);
 
+  const router = useRouter();
   const { showToast } = useCustomToast();
   // جلب بيانات أيام التوثيق من الباك اند
-  const {
-    data: progressData,
-    loading,
-    error,
-  } = useGetData(GET_DOCUMENTION_DAYS_URL(challengeId));
-  const {
-    addItem,
-    loading: _loading,
-    error: _error,
-  } = useAddData(DOCUMENT_DAY_URL); // لتوثيق اليوم
+  const { data: progressData, loading, error } = useGetData(GET_DOCUMENTION_DAYS_URL(challengeId));
+  const { addItem, loading: _loading, error: _error } = useAddData(DOCUMENT_DAY_URL); // لتوثيق اليوم
 
   useEffect(() => {
     if (progressData) {
@@ -202,13 +199,23 @@ export default function DaysGrid({ challengeId, startDate, endDate, challenge })
     );
   return (
     <Box p={5}>
+      <Button
+        leftIcon={<ArrowBackIcon />}
+        colorScheme="gray"
+        variant="solid"
+        mb={4}
+        onClick={() => setActivePage("myChallenges")} 
+      >
+      الرجوع
+      </Button>
+
       <Text fontSize="2xl" fontWeight="bold" mb={5}>
-        بطاقات أيام التحدي
+        بطاقات أيام تحدي الستين {challenge && challenge?.announcedChallengeId.challengeNumber}
       </Text>
 
       {/* شبكة بطاقات الأيام */}
       <SimpleGrid columns={{ base: 2, md: 4, lg: 6 }} spacing={4}>
-        {days.map((day) => {
+        {days && days.map((day) => {
           let cardBg = openBg;
           if (day.locked) cardBg = lockedBg;
           if (day.documented) cardBg = documentedBg;
@@ -227,6 +234,13 @@ export default function DaysGrid({ challengeId, startDate, endDate, challenge })
             >
               <Text fontSize="lg" fontWeight="bold">
                 اليوم {day.dayNumber}
+              </Text>
+              <Text fontSize="xs" mb={1} color="gray.700">
+                {new Date(day.date).toLocaleDateString("ar-EG", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
               </Text>
               <Text fontSize="sm" color="gray.700">
                 النقاط: {day.dailyPoints}

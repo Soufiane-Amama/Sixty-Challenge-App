@@ -24,10 +24,10 @@ const HomePage = dynamic(() => import("@/src/app/dashboard/homePage/page"));
 
 
 const DashboardLayout = () => {
-  const { startDate, setStartDate, endDate, setEndDate, setChallenge, challenge } = useApp(); 
+  const { startDate, setStartDate, endDate, setEndDate, setChallenge, challenge, activePage, setActivePage } = useApp(); 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isAdmin, setIsAdmin] = useState(true);
-  const [activePage, setActivePage] = useState("dashboard");
+  // const [activePage, setActivePage] = useState("dashboard");
 
     // حالة إضافية للاحتفاظ بمعرف التحدي الذي سنعرض أيامه في DaysGrid
     const [daysGridChallengeId, setDaysGridChallengeId] = useState(null);

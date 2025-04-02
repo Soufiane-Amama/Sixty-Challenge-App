@@ -4,6 +4,7 @@ import HeroBadge from "../../elements/HeroBadge";
 import { useRouter } from "next/navigation";
 import { useApp } from '@/src/context/AppContext';
 
+
 const HeroSection = () => {
   const { user } = useApp(); 
   const router = useRouter();

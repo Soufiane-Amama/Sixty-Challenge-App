@@ -8,8 +8,6 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet'); // إضافة helmet لتعزيز الأمان
 const connectDB = require('./config/db');
 const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
-const axios = require("axios");
-const translate = require("@iamtraction/google-translate");
 const { generatePlan } = require("./helpers/aiService");
 
 const userRoutes = require('./routes/userRoutes');

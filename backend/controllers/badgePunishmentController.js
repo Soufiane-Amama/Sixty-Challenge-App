@@ -69,6 +69,19 @@ const calculateWeeklyResults = asyncHandler(async (req, res) => {
     .json({ message: "تم حساب النتائج الأسبوعية", weeklyPoints, badgeType });
 });
 
+// جلب جميع شارات المستخدم
+const getBadges = asyncHandler(async (req, res) => {
+  const badges = await Badge.find({ userId: req.user._id });
+  res.status(200).json(badges);
+});
+
+// جلب جميع شارات المستخدم
+const getPunishments = asyncHandler(async (req, res) => {
+  const punishments = await Punishment.find({ userId: req.user._id });
+  res.status(200).json(punishments);
+});
+
+
 const awardWeeklyOutcome = asyncHandler(async (challengeId, userId) => {
   try {
     // جلب تحدي المستخدم مع بيانات التحدي المعلن
@@ -225,4 +238,8 @@ const awardWeeklyOutcome = asyncHandler(async (challengeId, userId) => {
   }
 });
 
-module.exports = { awardWeeklyOutcome, calculateWeeklyResults };
+module.exports = { 
+  calculateWeeklyResults,
+  getBadges,
+  getPunishments,
+};

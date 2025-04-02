@@ -38,3 +38,9 @@ export const DOCUMENT_DAY_URL = "/api/daily-progress";
 // AI Notification URLs 
 export const GET_RECOMMENDATIONS_URL = "/api/ai-notification/recommendation";
 export const GET_MOTIVATION_URL = "/api/ai-notification/motivation";
+
+
+// Badge and Punishment URLs
+export const GET_BADGES_URL = "/api/badge-punishment/badges";
+export const GET_PUNISHMENTS_URL = "/api/badge-punishment/punishments";
+

@@ -26,7 +26,7 @@ export default function ProfilePage() {
           </VStack>
         ) : (
           <VStack spacing={2} textAlign="center">
-            <Avatar name={user.fullName} size="2xl" />
+            <Avatar src={user?.gender === "بطل" ? "/images/hero-1.png" : "/images/heroine-1.png"} name={user.fullName} size="2xl" />
             <Text fontSize="2xl" fontWeight="bold">{user.fullName}</Text>
             <Text fontSize="md" color="gray.500">{user.gender} | {user.country}</Text>
 

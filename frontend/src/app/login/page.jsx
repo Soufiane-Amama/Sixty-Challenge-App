@@ -137,7 +137,7 @@ export default function Login() {
       <Box
         flex="1"
         height="100vh"
-        display="flex"
+        display={{ base: "none", md: "flex" }}
         alignItems="center"
         justifyContent="center"
         overflow="hidden"

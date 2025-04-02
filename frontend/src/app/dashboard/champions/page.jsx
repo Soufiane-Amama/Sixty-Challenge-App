@@ -4,7 +4,7 @@ import {
   Box,
   Text,
   VStack,
-  HStack,
+  Stack,
   Avatar,
   Table,
   Thead,
@@ -22,6 +22,7 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
+  useBreakpointValue,
   Spinner,
   Flex,
 } from "@chakra-ui/react";
@@ -39,7 +40,6 @@ import useDeleteData from "@/src/hooks/useDeleteData";
 import {  } from "@/src/config/urls";
 
 
-// بيانات الأبطال (مثال)
 const champions = [
   { id: 1, name: "طارق إبراهيم", points: 1000, image: "/images/hero-.png", rank: "gold" },
   { id: 2, name: "معتصم يوسف", points: 900, image: "/images/hero-.png", rank: "silver" },
@@ -56,18 +56,19 @@ export default function ChampionsPage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedChampion, setSelectedChampion] = useState(null);
 
-  // فتح النافذة وعرض بيانات البطل
   const handleOpenModal = (champion) => {
     setSelectedChampion(champion);
     onOpen();
   };
 
-  // ألوان الميداليات
   const rankColors = {
     gold: "yellow.400",
     silver: "gray.400",
     bronze: "orange.500",
   };
+
+  // تحديد اتجاه عرض الأبطال بناءً على حجم الشاشة
+  const stackDirection = useBreakpointValue({ base: "column", md: "row" });
 
   return (
     <Box p={6} bg="gray.50" minH="100vh">
@@ -75,9 +76,9 @@ export default function ChampionsPage() {
         أبطال المتصدرين 🏆
       </Text>
 
-      {/* أفضل 3 أبطال */}
-      <HStack justify="center" spacing={10} mb={10}>
-        {champions.slice(0, 3).map((champion, index) => (
+      {/* أفضل 3 أبطال - يصبح عموديًا على الشاشات الصغيرة */}
+      <Stack direction={stackDirection} justify="center" spacing={6} mb={10} wrap="wrap">
+        {champions.slice(0, 3).map((champion) => (
           <VStack key={champion.id} spacing={3} onClick={() => handleOpenModal(champion)} cursor="pointer">
             <Box
               borderWidth={3}
@@ -103,31 +104,33 @@ export default function ChampionsPage() {
             <Text color="gray.600">{champion.points} نقطة</Text>
           </VStack>
         ))}
-      </HStack>
+      </Stack>
 
-      {/* باقي الأبطال */}
-      <Table variant="simple" bg="white" borderRadius="md" shadow="md">
-        <Thead bg="yellow.300">
-          <Tr>
-            <Th textAlign="right">الترتيب</Th>
-            <Th textAlign="right">الصورة</Th>
-            <Th textAlign="right">الاسم</Th>
-            <Th textAlign="right">النقاط</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {champions.slice(3).map((champion, index) => (
-            <Tr key={champion.id} onClick={() => handleOpenModal(champion)} cursor="pointer" _hover={{ bg: "gray.100" }}>
-              <Td>{index + 4}</Td>
-              <Td>
-                <Avatar size="sm" src={champion.image} />
-              </Td>
-              <Td>{champion.name}</Td>
-              <Td>{champion.points} نقطة</Td>
+      {/* جدول الأبطال مع إمكانية التمرير الأفقي على الشاشات الصغيرة */}
+      <Box overflowX="auto">
+        <Table variant="simple" bg="white" borderRadius="md" shadow="md">
+          <Thead bg="yellow.300">
+            <Tr>
+              <Th textAlign="right">الترتيب</Th>
+              <Th textAlign="right">الصورة</Th>
+              <Th textAlign="right">الاسم</Th>
+              <Th textAlign="right">النقاط</Th>
             </Tr>
-          ))}
-        </Tbody>
-      </Table>
+          </Thead>
+          <Tbody>
+            {champions.slice(3).map((champion, index) => (
+              <Tr key={champion.id} onClick={() => handleOpenModal(champion)} cursor="pointer" _hover={{ bg: "gray.100" }}>
+                <Td>{index + 4}</Td>
+                <Td>
+                  <Avatar size="sm" src={champion.image} />
+                </Td>
+                <Td>{champion.name}</Td>
+                <Td>{champion.points} نقطة</Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </Box>
 
       {/* نافذة عرض معلومات البطل */}
       <Modal isOpen={isOpen} onClose={onClose} size="md">

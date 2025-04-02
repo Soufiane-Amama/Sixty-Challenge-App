@@ -69,7 +69,7 @@ export default function Register() {
   return (
     <Flex direction={{ base: "column", md: "row" }} align="center" justify="center" height="100vh">
       {/* القسم الأيسر للصورة */}
-      <Box flex="1" height="100vh" display="flex" alignItems="center" justifyContent="center">
+      <Box flex="1" height="100vh" display={{ base: "none", md: "flex" }} alignItems="center" justifyContent="center">
         <Image src={myImg} alt="تسجيل حساب" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50px" }} />
       </Box>
 
